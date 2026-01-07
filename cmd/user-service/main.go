@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	db, err := badgerdb.Open("./data")
+	db, err := badgerdb.Open("./data/user")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,7 +19,7 @@ func main() {
 	handler := user.NewHandler(store)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func (w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("ok"))
 	})
 	mux.HandleFunc("/users", handler.CreateUser)

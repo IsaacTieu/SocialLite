@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	db, err := badgerdb.Open("./data")
+	db, err := badgerdb.Open("./data/post")
 	if err != nil {
 		log.Fatal(err)
 	}

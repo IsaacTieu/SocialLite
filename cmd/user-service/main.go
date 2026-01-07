@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"mini-feed/internal/middleware"
 	"github.com/redis/go-redis/v9"
 	"mini-feed/internal/services/user"
 	badgerdb "mini-feed/internal/storage/badger"
@@ -24,6 +26,8 @@ func main() {
 	handler := user.NewHandler(store, rdb)
 
 	mux := http.NewServeMux()
+
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("ok"))
 	})
@@ -31,5 +35,7 @@ func main() {
 	mux.HandleFunc("/follow", handler.Follow)
 
 	log.Println("user service listening on :8081")
-	log.Fatal(http.ListenAndServe(":8081", mux))
+
+	wrappedMux := middleware.LoggerAndMetrics(mux)
+	log.Fatal(http.ListenAndServe(":8081", wrappedMux))
 }
